@@ -1,4 +1,4 @@
-import { UndoHistory } from './index';
+import { UndoHistory } from '../src/index';
 
 describe("history", () => {
   interface State { foo: string }
@@ -80,6 +80,56 @@ describe("history", () => {
     it("won't break on a cleared history", () => {
       history.clear();
       history.undo(); // don't throw
+    });
+
+    it("longer test", () => {
+      state.foo = "1";
+      history.record();
+
+      state.foo = "2";
+      history.record();
+
+      state.foo = "3";
+      history.record();
+
+      state.foo = "4";
+      history.record();
+
+      history.undo();
+      expect(state.foo).toEqual("3");
+
+      history.undo();
+      expect(state.foo).toEqual("2");
+
+      history.redo();
+      expect(state.foo).toEqual("3");
+
+      state.foo = "A";
+      history.record();
+      
+      state.foo = "B";
+      history.record();
+      
+      state.foo = "C";
+      history.record();
+
+      history.undo();
+      expect(state.foo).toEqual("B");
+
+      history.undo();
+      expect(state.foo).toEqual("A");
+
+      history.undo();
+      expect(state.foo).toEqual("3");
+
+      history.undo();
+      expect(state.foo).toEqual("2");
+
+      history.undo();
+      expect(state.foo).toEqual("1");
+      
+      history.undo();
+      expect(state.foo).toEqual("fooInitialState");
     });
   });
 
