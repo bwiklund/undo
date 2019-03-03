@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "jest --coverage",
+    "test:watch": "jest --coverage --watch",
     "prepare": "npm run build",
     "build": "tsc"
   },
