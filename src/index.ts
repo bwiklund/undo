@@ -8,11 +8,11 @@ export class History<T> {
 
   constructor(
     public maxDepth: number,
-    private getCopyOfState: () => T,
-    private sendCopyOfState: (state: T) => void) { }
+    private getClone: () => T,
+    private setClone: (state: T) => void) { }
 
   record(label: string = "") {
-    var newState = new HistoryState(this.getCopyOfState(), label);
+    var newState = new HistoryState(this.getClone(), label);
 
     this.index++;
     this.states.splice(this.index); // cut off the end of the array
@@ -27,14 +27,14 @@ export class History<T> {
 
   undo() {
     if (this.states[this.index - 1]) {
-      this.sendCopyOfState(this.states[this.index - 1].state);
+      this.setClone(this.states[this.index - 1].state);
       if (this.index > 0) this.index--;
     }
   }
 
   redo() {
     if (this.states[this.index+1]) {
-      this.sendCopyOfState(this.states[this.index+1].state);
+      this.setClone(this.states[this.index+1].state);
       this.index++;
     }
   }
