@@ -1,15 +1,17 @@
 # History
 
-A js/ts library to implement undo and redo functionality, with a simple API.
+A js/ts library to implement undo and redo functionality, with a simple API, with no dependencies or framework requirements.
 
 # Usage
 ```ts
+import { UndoHistory } from 'undo-history';
+
 // set up a trivial class to represent our app's state
 interface State { foo: string }
 var state = {foo: "cats"};
 
 // set up a new `History` object to track our state, with basic `getClone` and `setClone` methods
-var history = new History<State>(
+var history = new UndoHistory<State>(
   // max undo depth
   100,
 

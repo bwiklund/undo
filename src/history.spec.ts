@@ -1,14 +1,14 @@
-import { History } from './index';
+import { UndoHistory } from './index';
 
 describe("history", () => {
   interface State { foo: string }
 
   var state: State;
-  var history: History<State>;
+  var history: UndoHistory<State>;
 
   beforeEach(() => {
     state = { foo: "fooInitialState" };
-    history = new History<State>(
+    history = new UndoHistory<State>(
       100,
       () => { return { foo: state.foo } },
       (newState) => state.foo = newState.foo

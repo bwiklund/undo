@@ -17,7 +17,10 @@
       "ts",
       "js"
     ],
-    "testRegex": "^.+\\.spec\\.ts$"
+    "testRegex": "^.+\\.spec\\.ts$",
+    "collectCoverageFrom": [
+      "src/**/*.ts"
+    ]
   },
   "files": [
     "lib"

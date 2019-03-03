@@ -2,7 +2,7 @@ class HistoryState<T> {
   public constructor(public state: T, public label: string) { }
 }
 
-export class History<T> {
+export class UndoHistory<T> {
   states: HistoryState<T>[] = [];
   index = -1;
 
@@ -28,7 +28,7 @@ export class History<T> {
   undo() {
     if (this.states[this.index - 1]) {
       this.setClone(this.states[this.index - 1].state);
-      if (this.index > 0) this.index--;
+      this.index--;
     }
   }
 
