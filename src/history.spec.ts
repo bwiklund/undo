@@ -5,6 +5,7 @@ describe("undo", () => {
   var state = "fooInitialState";
 
   beforeEach(() => {
+    state = "fooInitialState";
     history = new History(() => state, (newState) => state = newState);
   });
 
@@ -26,5 +27,19 @@ describe("undo", () => {
     expect(state).toEqual("fooInitialState");
     history.redo();
     expect(state).toEqual("someNewState");
+  });
+  
+  it("won't break on too many undos", () => {
+    history.undo();
+    history.undo();
+    history.undo();
+    expect(state).toEqual("fooInitialState");
+  });
+  
+  it("won't break on too many redos", () => {
+    history.redo();
+    history.redo();
+    history.redo();
+    expect(state).toEqual("fooInitialState");
   });
 });

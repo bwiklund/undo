@@ -2,19 +2,23 @@ export class History {
   undoStack: any[] = [];
   redoStack: any[] = [];
 
-  constructor(private getState: () => any, private setState: (state: any) => void) { }
+  constructor(private getCopyOfState: () => any, private sendCopyOfState: (state: any) => void) { }
 
   record() {
-    this.undoStack.push(this.getState());
+    this.undoStack.push(this.getCopyOfState());
   }
 
   undo() {
-    this.redoStack.push(this.getState());
-    this.setState(this.undoStack.pop());
+    if (this.undoStack.length > 0) {
+      this.redoStack.push(this.getCopyOfState());
+      this.sendCopyOfState(this.undoStack.pop());
+    }
   }
 
   redo() {
-    this.undoStack.push(this.getState());
-    this.setState(this.redoStack.pop());
+    if (this.redoStack.length > 0) {
+      this.undoStack.push(this.getCopyOfState());
+      this.sendCopyOfState(this.redoStack.pop());
+    }
   }
 }
