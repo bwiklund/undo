@@ -1,32 +1,49 @@
+class HistoryState<T> {
+  public constructor(public state: T, public label: string) { }
+}
+
 export class History<T> {
-  undoStack: T[] = [];
-  redoStack: T[] = [];
+  states: HistoryState<T>[] = [];
+  index = -1;
 
   constructor(
     public maxDepth: number,
     private getCopyOfState: () => T,
     private sendCopyOfState: (state: T) => void) { }
 
-  record() {
-    this.undoStack.push(this.getCopyOfState());
-    this.redoStack.length = 0;
+  record(label: string = "") {
+    var newState = new HistoryState(this.getCopyOfState(), label);
 
-    if (this.undoStack.length > this.maxDepth) {
-      this.undoStack.splice(0, this.undoStack.length - this.maxDepth);
+    this.index++;
+    this.states.splice(this.index); // cut off the end of the array
+    this.states[this.index] = newState;
+
+    if (this.states.length > this.maxDepth) {
+      var trimCount = this.states.length - this.maxDepth;
+      this.states.splice(0, trimCount);
+      this.index -= trimCount;
     }
   }
 
   undo() {
-    if (this.undoStack.length > 0) {
-      this.redoStack.push(this.getCopyOfState());
-      this.sendCopyOfState(this.undoStack.pop()!);
+    if (this.states[this.index - 1]) {
+      this.sendCopyOfState(this.states[this.index - 1].state);
+      if (this.index > 0) this.index--;
     }
   }
 
   redo() {
-    if (this.redoStack.length > 0) {
-      this.undoStack.push(this.getCopyOfState());
-      this.sendCopyOfState(this.redoStack.pop()!);
+    if (this.states[this.index+1]) {
+      this.sendCopyOfState(this.states[this.index+1].state);
+      this.index++;
     }
+  }
+
+  peekPreviousState() {
+    return this.states[this.index - 1];
+  }
+
+  peekNextState() {
+    return this.states[this.index + 1];
   }
 }
