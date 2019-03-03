@@ -1,4 +1,4 @@
-# History
+# undo-history
 
 A js/ts library to implement undo and redo functionality, with a simple API, with no dependencies or framework requirements.
 
