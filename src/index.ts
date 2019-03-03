@@ -2,10 +2,18 @@ export class History {
   undoStack: any[] = [];
   redoStack: any[] = [];
 
-  constructor(private getCopyOfState: () => any, private sendCopyOfState: (state: any) => void) { }
+  constructor(
+    public maxDepth: number,
+    private getCopyOfState: () => any,
+    private sendCopyOfState: (state: any) => void) { }
 
   record() {
     this.undoStack.push(this.getCopyOfState());
+    this.redoStack.length = 0;
+
+    if (this.undoStack.length > this.maxDepth) {
+      this.undoStack.splice(0, this.undoStack.length - this.maxDepth);
+    }
   }
 
   undo() {

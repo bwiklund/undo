@@ -6,7 +6,7 @@ describe("undo", () => {
 
   beforeEach(() => {
     state = "fooInitialState";
-    history = new History(() => state, (newState) => state = newState);
+    history = new History(100, () => state, (newState) => state = newState);
   });
 
   it("is defined", () => {
@@ -41,5 +41,23 @@ describe("undo", () => {
     history.redo();
     history.redo();
     expect(state).toEqual("fooInitialState");
+  });
+  
+  it("recording a new state clears redo", () => {
+    history.record();
+    history.undo();
+    expect(history.redoStack.length).toEqual(1);
+    history.record();
+    expect(history.redoStack.length).toEqual(0);
+  });
+  
+  it("respects the maximum depth", () => {
+    history.maxDepth = 3;
+    history.record();
+    history.record();
+    history.record();
+    expect(history.undoStack.length).toEqual(3);
+    history.record();
+    expect(history.undoStack.length).toEqual(3);
   });
 });
