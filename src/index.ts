@@ -1,11 +1,11 @@
-export class History {
-  undoStack: any[] = [];
-  redoStack: any[] = [];
+export class History<T> {
+  undoStack: T[] = [];
+  redoStack: T[] = [];
 
   constructor(
     public maxDepth: number,
-    private getCopyOfState: () => any,
-    private sendCopyOfState: (state: any) => void) { }
+    private getCopyOfState: () => T,
+    private sendCopyOfState: (state: T) => void) { }
 
   record() {
     this.undoStack.push(this.getCopyOfState());
@@ -19,14 +19,14 @@ export class History {
   undo() {
     if (this.undoStack.length > 0) {
       this.redoStack.push(this.getCopyOfState());
-      this.sendCopyOfState(this.undoStack.pop());
+      this.sendCopyOfState(this.undoStack.pop()!);
     }
   }
 
   redo() {
     if (this.redoStack.length > 0) {
       this.undoStack.push(this.getCopyOfState());
-      this.sendCopyOfState(this.redoStack.pop());
+      this.sendCopyOfState(this.redoStack.pop()!);
     }
   }
 }
