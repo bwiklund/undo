@@ -1,0 +1,23 @@
+{
+  "name": "undo",
+  "version": "0.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bwiklund/undo.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/bwiklund/undo/issues"
+  },
+  "homepage": "https://github.com/bwiklund/undo#readme",
+  "devDependencies": {
+    "typescript": "^3.3.3333"
+  }
+}
