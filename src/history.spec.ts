@@ -44,6 +44,7 @@ describe("history", () => {
       history.undo();
       history.undo();
       expect(state.foo).toEqual("fooInitialState");
+      expect(history.peekPreviousState()).toBeUndefined();
     });
 
     it("won't break on too many redos", () => {
@@ -69,6 +70,16 @@ describe("history", () => {
       expect(history.states.length).toEqual(3);
       history.record();
       expect(history.states.length).toEqual(3);
+    });
+
+    it("can be cleared", () => {
+      history.clear();
+      expect(history.states.length).toBe(0);
+    });
+
+    it("won't break on a cleared history", () => {
+      history.clear();
+      history.undo(); // don't throw
     });
   });
 

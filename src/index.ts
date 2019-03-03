@@ -39,6 +39,11 @@ export class History<T> {
     }
   }
 
+  clear() {
+    this.states.length = 0;
+    this.index = -1;
+  }
+
   peekPreviousState() {
     return this.states[this.index - 1];
   }
