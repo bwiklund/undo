@@ -1,6 +1,6 @@
 {
   "name": "undo-history",
-  "version": "2.0.0-alpha.1",
+  "version": "2.0.0-alpha.2",
   "description": "",
   "main": "lib/index.js",
   "scripts": {
@@ -37,9 +37,9 @@
   },
   "homepage": "https://github.com/bwiklund/undo#readme",
   "devDependencies": {
-    "@types/jest": "^24.0.9",
-    "jest": "^24.1.0",
-    "ts-jest": "^24.0.0",
-    "typescript": "^3.3.3333"
+    "@types/jest": "^24.0.20",
+    "jest": "^24.9.0",
+    "ts-jest": "^24.1.0",
+    "typescript": "^3.6.4"
   }
 }
