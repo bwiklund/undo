@@ -1,19 +1,23 @@
-import { UndoHistory } from '../src/index';
+import {
+  UndoHistory,
+  mkUndo,
+  record,
+  undo,
+  redo,
+  peekPreviousState,
+  clear
+} from "../src/index";
 
 describe("history", () => {
-  interface State { foo: string }
+  interface State {
+    foo: string;
+  }
 
-  var state: State;
   var history: UndoHistory<State>;
 
   beforeEach(() => {
-    state = { foo: "fooInitialState" };
-    history = new UndoHistory<State>(
-      100,
-      () => { return { foo: state.foo } },
-      (newState) => state.foo = newState.foo
-    );
-    history.record("Initial state");
+    history = mkUndo<State>(100);
+    record(history, { foo: "fooInitialState" });
   });
 
   describe("basic functionality", () => {
@@ -22,129 +26,92 @@ describe("history", () => {
     });
 
     it("can undo", () => {
-      state.foo = "someNewState";
-      history.record();
-
-      history.undo();
-      expect(state.foo).toEqual("fooInitialState");
+      record(history, { foo: "bar" });
+      expect(undo(history)).toEqual({ foo: "fooInitialState" });
     });
 
     it("can redo", () => {
-      state.foo = "someNewState";
-      history.record();
+      record(history, { foo: "bar" });
 
-      history.undo();
-      expect(state.foo).toEqual("fooInitialState");
-      history.redo();
-      expect(state.foo).toEqual("someNewState");
+      expect(undo(history)).toEqual({ foo: "fooInitialState" });
+      expect(redo(history)).toEqual({ foo: "bar" });
     });
 
     it("won't break on too many undos", () => {
-      history.undo();
-      history.undo();
-      history.undo();
-      expect(state.foo).toEqual("fooInitialState");
-      expect(history.peekPreviousState()).toBeUndefined();
+      undo(history);
+      undo(history);
+      undo(history);
+      expect(undo(history)).toEqual({ foo: "fooInitialState" });
+      expect(peekPreviousState(history)).toBeUndefined();
     });
 
     it("won't break on too many redos", () => {
-      history.redo();
-      history.redo();
-      history.redo();
-      expect(state.foo).toEqual("fooInitialState");
+      redo(history);
+      redo(history);
+      redo(history);
+      expect(redo(history)).toEqual({ foo: "fooInitialState" });
     });
 
     it("recording a new state clears redo", () => {
-      history.record();
-      history.undo();
+      record(history, { foo: "bar" });
+      undo(history);
       expect(history.states.length).toEqual(2);
-      history.record();
+      record(history, { foo: "bar" });
       expect(history.states.length).toEqual(2);
     });
 
     it("respects the maximum depth", () => {
       history.maxDepth = 3;
-      history.record();
-      history.record();
-      history.record();
+      record(history, { foo: "bar" });
+      record(history, { foo: "bar" });
+      record(history, { foo: "bar" });
       expect(history.states.length).toEqual(3);
-      history.record();
+      record(history, { foo: "bar" });
       expect(history.states.length).toEqual(3);
     });
 
     it("can be cleared", () => {
-      history.clear();
+      clear(history);
       expect(history.states.length).toBe(0);
     });
 
     it("won't break on a cleared history", () => {
-      history.clear();
-      history.undo(); // don't throw
+      clear(history);
+      undo(history);
     });
 
     it("longer test", () => {
-      state.foo = "1";
-      history.record();
+      record(history, { foo: "1" });
 
-      state.foo = "2";
-      history.record();
+      record(history, { foo: "2" });
 
-      state.foo = "3";
-      history.record();
+      record(history, { foo: "3" });
 
-      state.foo = "4";
-      history.record();
+      record(history, { foo: "4" });
 
-      history.undo();
-      expect(state.foo).toEqual("3");
+      expect(undo(history)).toEqual({ foo: "3" });
 
-      history.undo();
-      expect(state.foo).toEqual("2");
+      expect(undo(history)).toEqual({ foo: "2" });
 
-      history.redo();
-      expect(state.foo).toEqual("3");
+      expect(redo(history)).toEqual({ foo: "3" });
 
-      state.foo = "A";
-      history.record();
-      
-      state.foo = "B";
-      history.record();
-      
-      state.foo = "C";
-      history.record();
+      record(history, { foo: "A" });
 
-      history.undo();
-      expect(state.foo).toEqual("B");
+      record(history, { foo: "B" });
 
-      history.undo();
-      expect(state.foo).toEqual("A");
+      record(history, { foo: "C" });
 
-      history.undo();
-      expect(state.foo).toEqual("3");
+      expect(undo(history)).toEqual({ foo: "B" });
 
-      history.undo();
-      expect(state.foo).toEqual("2");
+      expect(undo(history)).toEqual({ foo: "A" });
 
-      history.undo();
-      expect(state.foo).toEqual("1");
-      
-      history.undo();
-      expect(state.foo).toEqual("fooInitialState");
+      expect(undo(history)).toEqual({ foo: "3" });
+
+      expect(undo(history)).toEqual({ foo: "2" });
+
+      expect(undo(history)).toEqual({ foo: "1" });
+
+      expect(undo(history)).toEqual({ foo: "fooInitialState" });
     });
   });
-
-  describe("labels", () => {
-    it("can record labels", () => {
-      state.foo = "someNewState";
-      history.record("Did something");
-  
-      expect(history.peekPreviousState().label).toEqual("Initial state");
-      expect(history.peekNextState()).toBeUndefined();
-
-      history.undo();
-      expect(history.peekPreviousState()).toBeUndefined();
-      expect(history.peekNextState().label).toEqual("Did something");
-    });
-  })
-
 });

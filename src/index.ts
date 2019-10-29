@@ -1,54 +1,54 @@
-class HistoryState<T> {
-  public constructor(public state: T, public label: string) { }
+export interface UndoHistory<T> {
+  states: T[];
+  index: number;
+  maxDepth?: number;
 }
 
-export class UndoHistory<T> {
-  states: HistoryState<T>[] = [];
-  index = -1;
+export function mkUndo<T>(maxDepth?: number): UndoHistory<T> {
+  return {
+    states: [],
+    index: -1,
+    maxDepth
+  };
+}
 
-  constructor(
-    public maxDepth: number,
-    private getClone: () => T,
-    private setClone: (state: T) => void) { }
+export function record<T>(self: UndoHistory<T>, state: T) {
+  self.index++;
+  self.states.splice(self.index); // cut off the end of the array
+  self.states[self.index] = state;
 
-  record(label: string = "") {
-    var newState = new HistoryState(this.getClone(), label);
-
-    this.index++;
-    this.states.splice(this.index); // cut off the end of the array
-    this.states[this.index] = newState;
-
-    if (this.states.length > this.maxDepth) {
-      var trimCount = this.states.length - this.maxDepth;
-      this.states.splice(0, trimCount);
-      this.index -= trimCount;
-    }
+  if (self.maxDepth != null && self.states.length > self.maxDepth) {
+    var trimCount = self.states.length - self.maxDepth;
+    self.states.splice(0, trimCount);
+    self.index -= trimCount;
   }
+}
 
-  undo() {
-    if (this.states[this.index - 1]) {
-      this.setClone(this.states[this.index - 1].state);
-      this.index--;
-    }
+export function undo<T>(self: UndoHistory<T>) {
+  if (self.states[self.index - 1]) {
+    return self.states[self.index-- - 1];
+  } else {
+    return self.states[self.index];
   }
+}
 
-  redo() {
-    if (this.states[this.index+1]) {
-      this.setClone(this.states[this.index+1].state);
-      this.index++;
-    }
+export function redo<T>(self: UndoHistory<T>) {
+  if (self.states[self.index + 1]) {
+    return self.states[self.index++ + 1];
+  } else {
+    return self.states[self.index];
   }
+}
 
-  clear() {
-    this.states.length = 0;
-    this.index = -1;
-  }
+export function clear<T>(self: UndoHistory<T>) {
+  self.states.length = 0;
+  self.index = -1;
+}
 
-  peekPreviousState() {
-    return this.states[this.index - 1];
-  }
+export function peekPreviousState<T>(self: UndoHistory<T>): T | undefined {
+  return self.states[self.index - 1];
+}
 
-  peekNextState() {
-    return this.states[this.index + 1];
-  }
+export function peekNextState<T>(self: UndoHistory<T>): T | undefined {
+  return self.states[self.index + 1];
 }
